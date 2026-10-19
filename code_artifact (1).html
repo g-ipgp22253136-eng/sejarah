@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五年级历史：梦幻时空魔法城堡</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+        
+        body {
+            font-family: 'Fredoka', 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 50%, #f472b6 100%);
+            min-height: 100vh;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #fbcfe8;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #f472b6;
+            border-radius: 4px;
+        }
+
+        .pink-pulse {
+            animation: pulse-ring-pink 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse-ring-pink {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(244, 114, 182, 0.8)); }
+            50% { transform: scale(1.18); filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.9)); }
+        }
+
+        .map-bg-grid {
+            background-color: #fff1f2;
+            background-image: radial-gradient(#f472b6 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(244, 114, 182, 0.4);
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-4 custom-scrollbar text-pink-950">
+
+    <!-- Main App Container -->
+    <div class="max-w-5xl mx-auto bg-white/90 backdrop-blur-xl rounded-3xl border-4 border-pink-300 shadow-2xl overflow-hidden flex flex-col min-h-[92vh]">
+        
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-pink-400 via-rose-300 to-pink-400 p-4 border-b-4 border-pink-300 flex flex-wrap items-center justify-between gap-4 text-white shadow-md">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-white text-pink-500 flex items-center justify-center font-extrabold text-2xl shadow-lg border-2 border-pink-200">
+                    <i class="fa-solid fa-crown text-pink-500"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-2xl font-black text-white flex items-center gap-2 drop-shadow-sm">
+                        五年级历史：梦幻魔法城堡 🌸
+                    </h1>
+                    <p class="text-xs text-pink-100 font-medium">KSSR Semakan 五年级历史复习与城堡建造</p>
+                </div>
+            </div>
+
+            <!-- Resource Indicators -->
+            <div class="flex items-center gap-3 bg-white/80 py-2 px-4 rounded-full border-2 border-pink-300 text-xs sm:text-sm font-bold text-pink-800 shadow-inner">
+                <div class="flex items-center gap-1.5" title="梦幻粉水晶">
+                    <i class="fa-solid fa-gem text-pink-500 text-base"></i>
+                    <span class="text-pink-400">水晶:</span>
+                    <span id="crystal-val" class="font-extrabold text-pink-600 text-base">30</span>
+                </div>
+                <div class="h-4 w-[2px] bg-pink-200"></div>
+                <div class="flex items-center gap-1.5" title="魔法金币">
+                    <i class="fa-solid fa-coins text-amber-400 text-base"></i>
+                    <span class="text-pink-400">金币:</span>
+                    <span id="gold-val" class="font-extrabold text-amber-500 text-base">100</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2">
+                <button onclick="toggleEditorModal()" class="bg-white/90 hover:bg-white text-pink-600 border-2 border-pink-200 px-3.5 py-2 rounded-2xl text-xs font-bold transition flex items-center gap-1.5 shadow">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span class="hidden sm:inline">编辑题目</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="bg-pink-100/80 px-4 pt-3 flex gap-2 border-b-2 border-pink-200">
+            <button id="nav-explore" onclick="switchSection('explore')" class="py-2.5 px-5 rounded-t-2xl font-bold text-xs sm:text-sm transition flex items-center gap-2 bg-pink-500 text-white shadow-md">
+                <i class="fa-solid fa-wand-sparkles"></i> 1. 魔法时空探索
+            </button>
+            <button id="nav-build" onclick="switchSection('build')" class="py-2.5 px-5 rounded-t-2xl font-bold text-xs sm:text-sm transition flex items-center gap-2 bg-pink-200/70 text-pink-700 hover:bg-pink-200">
+                <i class="fa-solid fa-castle"></i> 2. 我的梦幻历史城堡
+            </button>
+            <button id="nav-archive" onclick="switchSection('archive')" class="py-2.5 px-5 rounded-t-2xl font-bold text-xs sm:text-sm transition flex items-center gap-2 bg-pink-200/70 text-pink-700 hover:bg-pink-200">
+                <i class="fa-solid fa-book-open-reader"></i> 3. 历史学霸宝典
+            </button>
+        </div>
+
+        <!-- Main Section 1: Exploration Map -->
+        <main id="section-explore" class="flex-1 p-4 sm:p-6 flex flex-col gap-5">
+            
+            <!-- Chapter Selector -->
+            <div class="flex flex-wrap items-center justify-between gap-4 glass-panel p-4 rounded-3xl border-2 border-pink-300 shadow-sm">
+                <div>
+                    <span class="text-[11px] font-bold text-white bg-pink-400 px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">当前复习单元</span>
+                    <h2 id="chapter-title" class="text-base sm:text-xl font-black text-pink-900 mt-1.5">加载中...</h2>
+                    <p id="chapter-desc" class="text-xs text-pink-600 mt-0.5">点击地图上闪光的魔法水晶，回答历史考点解锁宝藏！</p>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="changeChapter(0)" class="chapter-btn px-3.5 py-1.5 rounded-2xl text-xs font-bold border-2 border-pink-300 bg-white hover:bg-pink-50 text-pink-700 transition">单元一: 遗产与君主</button>
+                    <button onclick="changeChapter(1)" class="chapter-btn px-3.5 py-1.5 rounded-2xl text-xs font-bold border-2 border-pink-300 bg-white hover:bg-pink-50 text-pink-700 transition">单元二: 英雄与独立</button>
+                    <button onclick="changeChapter(2)" class="chapter-btn px-3.5 py-1.5 rounded-2xl text-xs font-bold border-2 border-pink-300 bg-white hover:bg-pink-50 text-pink-700 transition">单元三: 国家核心象征</button>
+                </div>
+            </div>
+
+            <!-- Map Area -->
+            <div class="relative w-full h-[380px] sm:h-[430px] map-bg-grid rounded-3xl border-4 border-pink-300 overflow-hidden shadow-inner flex items-center justify-center">
+                
+                <!-- Map Background Watermark -->
+                <div class="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
+                    <i class="fa-solid fa-shield-cat text-[260px] text-pink-400"></i>
+                </div>
+
+                <!-- Markers Container -->
+                <div id="map-markers-container" class="absolute inset-0"></div>
+
+                <!-- Bottom Helper Bar -->
+                <div class="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl border-2 border-pink-300 flex items-center justify-between text-xs shadow-md">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-sparkles text-pink-500 text-lg"></i>
+                        <span class="text-pink-900 font-bold">寻找地图上的<strong class="text-pink-600">【魔法心形/水晶】</strong>开始解谜！</span>
+                    </div>
+                    <span id="chapter-progress-tag" class="font-extrabold text-pink-600 bg-pink-100 px-3 py-1 rounded-full border border-pink-300">探险进度: 0/3</span>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Main Section 2: Castle Builder -->
+        <main id="section-build" class="hidden flex-1 p-4 sm:p-6 space-y-5">
+            <div class="glass-panel p-4 rounded-3xl border-2 border-pink-300 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-black text-pink-800">🌸 梦幻历史皇家城堡</h2>
+                    <p class="text-xs text-pink-600">用解答历史题目赚取的【粉水晶】与【金币】建造属于你的历史城堡！</p>
+                </div>
+                <div class="text-right bg-pink-100/80 px-4 py-2 rounded-2xl border border-pink-300">
+                    <span class="text-xs text-pink-500 font-bold">城堡魅力值</span>
+                    <div id="prosperity-score" class="text-xl font-black text-pink-600">0 pts</div>
+                </div>
+            </div>
+
+            <!-- Buildings Grid -->
+            <div id="buildings-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Injected via JS -->
+            </div>
+        </main>
+
+        <!-- Main Section 3: Knowledge Archive -->
+        <main id="section-archive" class="hidden flex-1 p-4 sm:p-6 space-y-5">
+            <div class="glass-panel p-4 rounded-3xl border-2 border-pink-300">
+                <h2 class="text-lg font-black text-pink-800 mb-1">📖 历史学霸考点宝典</h2>
+                <p class="text-xs text-pink-600">解锁的所有历史知识要点都会收录在这里，方便考前复习！</p>
+            </div>
+
+            <div id="archive-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Injected via JS -->
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-pink-100/60 border-t-2 border-pink-200 p-3 text-center text-xs text-pink-500 font-bold">
+            五年级历史 KSSR Semakan 复习小游戏 · 祝学习愉快！ ✨
+        </footer>
+    </div>
+
+    <!-- Investigation Quiz Modal -->
+    <div id="investigate-modal" class="fixed inset-0 bg-pink-950/40 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border-4 border-pink-300 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative">
+            <div class="flex items-center justify-between pb-3 mb-4 border-b-2 border-pink-100">
+                <span class="bg-pink-100 text-pink-600 text-xs font-extrabold px-3 py-1 rounded-full border border-pink-200 flex items-center gap-1">
+                    <i class="fa-solid fa-heart"></i> 历史魔法考验
+                </span>
+                <span id="modal-clue-title" class="text-xs text-pink-400 font-bold">线索 #1</span>
+            </div>
+
+            <div class="mb-4">
+                <h3 id="modal-question" class="text-base sm:text-lg font-bold text-pink-950 leading-snug">问题加载中...</h3>
+            </div>
+
+            <!-- Options Container -->
+            <div id="modal-options" class="space-y-2.5 mb-5">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Feedback Box -->
+            <div id="modal-feedback" class="hidden p-3.5 rounded-2xl text-xs leading-relaxed mb-4"></div>
+
+            <div class="flex justify-end gap-3">
+                <button id="modal-next-btn" onclick="closeInvestigateModal()" class="hidden bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white font-black px-6 py-2.5 rounded-2xl transition text-sm shadow-md">
+                    领取奖励并继续探险 <i class="fa-solid fa-sparkles ml-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editor Modal -->
+    <div id="editor-modal" class="fixed inset-0 bg-pink-950/40 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border-4 border-pink-300 rounded-3xl max-w-2xl w-full p-6 shadow-2xl max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center pb-3 border-b-2 border-pink-100 mb-4">
+                <h3 class="text-base sm:text-lg font-bold text-pink-800 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> 教师题目与教案配置面板
+                </h3>
+                <button onclick="toggleEditorModal()" class="text-pink-400 hover:text-pink-600 text-xl font-bold">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1 text-xs">
+                <div class="bg-pink-50 p-3 rounded-2xl border border-pink-200">
+                    <label class="block font-bold text-pink-800 mb-1.5">选择预设复习题库：</label>
+                    <button onclick="loadPresetData('kssr5')" class="w-full p-3 bg-white hover:bg-pink-100/50 rounded-xl border-2 border-pink-300 text-left transition flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-pink-700">🇲🇾 马来西亚 KSSR Semakan 五年级历史</div>
+                            <div class="text-[10px] text-pink-500">涵盖：君主立宪、抗殖民英雄、独立历程、国旗/国歌/国花/国徽</div>
+                        </div>
+                        <i class="fa-solid fa-circle-check text-pink-500 text-lg"></i>
+                    </button>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-pink-800 mb-1">JSON 题目编辑区：</label>
+                    <textarea id="editor-json-text" class="w-full h-48 bg-pink-50/50 border-2 border-pink-200 rounded-2xl p-3 text-pink-900 font-mono text-[11px] focus:outline-none focus:border-pink-400" placeholder="在此编辑或粘贴题目..."></textarea>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t-2 border-pink-100 flex justify-end gap-3 mt-2">
+                <button onclick="toggleEditorModal()" class="px-4 py-2 bg-pink-100 text-pink-700 rounded-xl hover:bg-pink-200 text-xs font-bold">取消</button>
+                <button onclick="saveCustomData()" class="px-5 py-2 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl text-xs shadow-md">保存配置</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Preset KSSR Primary 5 History Data (Malaysia Curriculum)
+        const KSSR_P5_DATA = [
+            {
+                chapterId: 0,
+                chapterTitle: "单元一：国家遗产与君主制度",
+                chapterDesc: "复习君主立宪制（Institusi Raja）、马来语地位以及各宗教和谐！",
+                clues: [
+                    {
+                        id: "c1_1",
+                        x: 25, y: 35,
+                        icon: "fa-crown",
+                        label: "君主立宪体制",
+                        q: "在马来西亚君主立宪制中，国家最高元首（Yang di-Pertuan Agong）是如何产生的？",
+                        options: [
+                            "由全民投票选举产生",
+                            "由九位州统治者在统治者会议中轮流选出（任期五年）",
+                            "世袭长子自动继承",
+                            "由首相直接任免"
+                        ],
+                        answer: 1,
+                        explanation: "国家最高元首由九位马来州属的州统治者轮流担任，每届任期为 5 年。",
+                        rewardCrystal: 30, rewardGold: 50,
+                        archiveKey: "【君主制度】国家最高元首（Yang di-Pertuan Agong）由九位州统治者轮流选出，任期 5 年。"
+                    },
+                    {
+                        id: "c1_2",
+                        x: 65, y: 30,
+                        icon: "fa-book-bookmark",
+                        label: "马来语地位",
+                        q: "根据《马来西亚联邦宪法》第152条文，马来语（Bahasa Melayu）的官方地位是什么？",
+                        options: [
+                            "地方方言",
+                            "商业专用语",
+                            "国家语文（Bahasa Kebangsaan）与官方语言",
+                            "外来语言"
+                        ],
+                        answer: 2,
+                        explanation: "宪法第152条文规定马来语为国语（Bahasa Kebangsaan），是促进各族团结的官方语文。",
+                        rewardCrystal: 30, rewardGold: 50,
+                        archiveKey: "【马来语】宪法第152条文确立马来语为国家语文（Bahasa Kebangsaan）。"
+                    },
+                    {
+                        id: "c1_3",
+                        x: 45, y: 65,
+                        icon: "fa-hands-praying",
+                        label: "宗教与信仰",
+                        q: "关于联邦宪法中的宗教条款，以下哪项叙述是正确的？",
+                        options: [
+                            "伊斯兰教是联邦宗教，但其他宗教可以和平安全地奉行",
+                            "全国只允许信仰一种宗教",
+                            "禁止任何宗教仪式",
+                            "宪法没有提及宗教"
+                        ],
+                        answer: 0,
+                        explanation: "宪法规定伊斯兰教为联邦宗教，同时也保障各族人民奉行其他宗教信仰的自由。",
+                        rewardCrystal: 30, rewardGold: 50,
+                        archiveKey: "【宗教自由】伊斯兰教为联邦宗教，宪法同时保障其他宗教和平奉行的自由。"
+                    }
+                ]
+            },
+            {
+                chapterId: 1,
+                chapterTitle: "单元二：抗殖民英雄与独立之路",
+                chapterDesc: "了解抗殖民英雄（Dol Said, Rentap, Mat Salleh等）及独立之父的伟大贡献！",
+                clues: [
+                    {
+                        id: "c2_1",
+                        x: 30, y: 35,
+                        icon: "fa-shield-heart",
+                        label: "抗殖民传奇英雄",
+                        q: "在砂拉越（Sarawak）以“Agi Idup, Agi Nsumbang”（只要还有一口气，就要奋斗到底）为口号抗击布鲁克政权的是哪位英雄？",
+                        options: ["Rentap (仁答)", "Mat Salleh (末沙里)", "Tok Janggut (督雅胡)", "Dol Said (多赛)"],
+                        answer: 0,
+                        explanation: "Rentap 是伊班族著名抗殖民英雄，在南巴（Nanga Skrang）建立堡垒坚决抵抗。",
+                        rewardCrystal: 35, rewardGold: 60,
+                        archiveKey: "【抗殖民英雄】Rentap（砂拉越）：以顽强斗志抵抗布鲁克政权的伊班族英雄。"
+                    },
+                    {
+                        id: "c2_2",
+                        x: 70, y: 55,
+                        icon: "fa-drum-steelpan",
+                        label: "沙巴抗殖民英雄",
+                        q: "在沙巴（Sabah）领导当地人民反抗北婆罗洲渣打公司（BNBC）不公统治的英雄是谁？",
+                        options: ["Mat Salleh (末沙里)", "Rentap (仁答)", "Dato' Maharajalela", "Tok Janggut"],
+                        answer: 0,
+                        explanation: "Mat Salleh 在沙巴建造坚固堡垒，勇敢反抗 BNBC 征收的不合理税收。",
+                        rewardCrystal: 35, rewardGold: 60,
+                        archiveKey: "【抗殖民英雄】Mat Salleh（沙巴）：反抗北婆罗洲渣打公司（BNBC）不公征税。"
+                    },
+                    {
+                        id: "c2_3",
+                        x: 50, y: 20,
+                        icon: "fa-bullhorn",
+                        label: "独立之父与默迪卡",
+                        q: "被称为“独立之父”（Bapa Kemerdekaan），并在1957年8月31日高呼7次“Merdeka!”的领导人是谁？",
+                        options: ["敦阿都拉萨 (Tun Abdul Razak)", "东姑阿都拉曼 (Tunku Abdul Rahman)", "敦胡先翁 (Tun Hussein Onn)", "敦马哈迪 (Tun Dr. Mahathir)"],
+                        answer: 1,
+                        explanation: "东姑阿都拉曼率领团队赴伦敦谈判，成功带领国家在1957年8月31日取得独立。",
+                        rewardCrystal: 40, rewardGold: 70,
+                        archiveKey: "【独立之父】东姑阿都拉曼：于1957年8月31日带领国家实现独立。"
+                    }
+                ]
+            },
+            {
+                chapterId: 2,
+                chapterTitle: "单元三：国家象征与核心标识",
+                chapterDesc: "复习国歌《Negaraku》、国旗《Jalur Gemilang》、国徽与国花！",
+                clues: [
+                    {
+                        id: "c3_1",
+                        x: 25, y: 30,
+                        icon: "fa-flag",
+                        label: "辉煌条纹国旗",
+                        q: "马来西亚国旗《Jalur Gemilang》上的14条红白相间条纹与十四角星代表什么？",
+                        options: [
+                            "14个不同族群",
+                            "13个州属与1个联邦直辖区",
+                            "14种主要农作物",
+                            "14个独立年份"
+                        ],
+                        answer: 1,
+                        explanation: "14条条纹与十四角星象征13个州及联邦直辖区（Wilayah Persekutuan）的团结。",
+                        rewardCrystal: 30, rewardGold: 50,
+                        archiveKey: "【国旗 Jalur Gemilang】14条红白条纹与十四角星代表13州与联邦直辖区的团结。"
+                    },
+                    {
+                        id: "c3_2",
+                        x: 55, y: 65,
+                        icon: "fa-spa",
+                        label: "国花大红花",
+                        q: "我国国花木槿（Bunga Raya）的五片红色花瓣象征着什么？",
+                        options: [
+                            "五大河流",
+                            "五项国家原则（Rukun Negara）",
+                            "五个主要城市",
+                            "五大洲"
+                        ],
+                        answer: 1,
+                        explanation: "大红花的五片红色花瓣代表我国的五项国家原则（Rukun Negara），红色象征勇敢。",
+                        rewardCrystal: 30, rewardGold: 50,
+                        archiveKey: "【国花 Bunga Raya】大红花的 5 片花瓣代表 5 项国家原则（Rukun Negara）。"
+                    },
+                    {
+                        id: "c3_3",
+                        x: 75, y: 30,
+                        icon: "fa-music",
+                        label: "国歌 Negaraku",
+                        q: "我国国歌《Negaraku》的旋律源自哪一个州属的州歌？",
+                        options: ["柔佛州 (Johor)", "霹雳州 (Perak - Terang Bulan)", "雪兰莪州 (Selangor)", "吉打州 (Kedah)"],
+                        answer: 1,
+                        explanation: "国歌《Negaraku》的曲调选自霹雳州州歌《Terang Bulan》。",
+                        rewardCrystal: 30, rewardGold: 50,
+                        archiveKey: "【国歌 Negaraku】旋律改编自霹雳州州歌《Terang Bulan》，象征爱国与团结。"
+                    }
+                ]
+            }
+        ];
+
+        // Pink Castle Buildings Database
+        const BUILDINGS_DB = [
+            {
+                id: "b_royal_hall",
+                name: "皇家君主议事厅",
+                icon: "fa-crown",
+                desc: "展示君主立宪制（Institusi Raja）历史与尊严的宫殿。",
+                costCrystal: 30, costGold: 50,
+                prosperity: 100,
+                built: false
+            },
+            {
+                id: "b_hero_shrine",
+                name: "独立英雄纪念圣殿",
+                icon: "fa-shield-halved",
+                desc: "铭记 Rentap, Mat Salleh, Dol Said 等抗殖民英雄。",
+                costCrystal: 50, costGold: 80,
+                prosperity: 150,
+                built: false
+            },
+            {
+                id: "b_flower_garden",
+                name: "大红花梦幻花园",
+                icon: "fa-spa",
+                desc: "盛开着国花 Bunga Raya 的粉色皇家花园。",
+                costCrystal: 40, costGold: 60,
+                prosperity: 120,
+                built: false
+            },
+            {
+                id: "b_merdeka_tower",
+                name: "默迪卡独立纪念钟楼",
+                icon: "fa-monument",
+                desc: "纪念1957年8月31日东姑阿都拉曼高呼 Merdeka！",
+                costCrystal: 60, costGold: 100,
+                prosperity: 200,
+                built: false
+            },
+            {
+                id: "b_emblem_pavilion",
+                name: "国徽与国旗文化亭",
+                icon: "fa-flag",
+                desc: "高高飘扬着 Jalur Gemilang 的文化展亭。",
+                costCrystal: 40, costGold: 70,
+                prosperity: 130,
+                built: false
+            }
+        ];
+
+        let chaptersData = JSON.parse(JSON.stringify(KSSR_P5_DATA));
+        let currentChapterIndex = 0;
+        let crystal = 30;
+        let gold = 100;
+        let solvedClues = new Set();
+        let unlockedArchives = [];
+
+        window.onload = function() {
+            renderMap();
+            renderBuildings();
+            renderArchive();
+            updateResourceUI();
+            document.getElementById('editor-json-text').value = JSON.stringify(chaptersData, null, 2);
+        };
+
+        function switchSection(sec) {
+            const sections = ['explore', 'build', 'archive'];
+            sections.forEach(s => {
+                document.getElementById(`section-${s}`).classList.add('hidden');
+                document.getElementById(`nav-${s}`).className = "py-2.5 px-5 rounded-t-2xl font-bold text-xs sm:text-sm transition flex items-center gap-2 bg-pink-200/70 text-pink-700 hover:bg-pink-200";
+            });
+
+            document.getElementById(`section-${sec}`).classList.remove('hidden');
+            document.getElementById(`nav-${sec}`).className = "py-2.5 px-5 rounded-t-2xl font-bold text-xs sm:text-sm transition flex items-center gap-2 bg-pink-500 text-white shadow-md";
+        }
+
+        function changeChapter(index) {
+            if (index >= 0 && index < chaptersData.length) {
+                currentChapterIndex = index;
+                renderMap();
+            }
+        }
+
+        function renderMap() {
+            const chap = chaptersData[currentChapterIndex];
+            document.getElementById('chapter-title').innerText = chap.chapterTitle;
+            document.getElementById('chapter-desc').innerText = chap.chapterDesc;
+
+            // Highlight Chapter Button
+            const btns = document.querySelectorAll('.chapter-btn');
+            btns.forEach((b, idx) => {
+                if (idx === currentChapterIndex) {
+                    b.className = "chapter-btn px-3.5 py-1.5 rounded-2xl text-xs font-extrabold border-2 border-pink-400 bg-pink-500 text-white shadow";
+                } else {
+                    b.className = "chapter-btn px-3.5 py-1.5 rounded-2xl text-xs font-bold border-2 border-pink-200 bg-white hover:bg-pink-50 text-pink-700 transition";
+                }
+            });
+
+            const container = document.getElementById('map-markers-container');
+            container.innerHTML = '';
+
+            let solvedInChap = 0;
+
+            chap.clues.forEach(clue => {
+                const isSolved = solvedClues.has(clue.id);
+                if (isSolved) solvedInChap++;
+
+                const marker = document.createElement('button');
+                marker.className = `absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5 cursor-pointer transition ${isSolved ? 'opacity-60 scale-90' : 'pink-pulse hover:scale-110'}`;
+                marker.style.left = `${clue.x}%`;
+                marker.style.top = `${clue.y}%`;
+
+                marker.innerHTML = `
+                    <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-3xl ${isSolved ? 'bg-pink-200 text-pink-400 border-pink-300' : 'bg-gradient-to-tr from-pink-500 via-rose-400 to-pink-300 text-white shadow-lg shadow-pink-400/40 border-2 border-white'} flex items-center justify-center text-lg sm:text-xl">
+                        <i class="fa-solid ${isSolved ? 'fa-check' : clue.icon}"></i>
+                    </div>
+                    <span class="bg-white/95 text-pink-700 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border border-pink-300 shadow-sm whitespace-nowrap">
+                        ${clue.label}
+                    </span>
+                `;
+
+                marker.onclick = () => openInvestigateModal(clue);
+                container.appendChild(marker);
+            });
+
+            document.getElementById('chapter-progress-tag').innerText = `探险进度: ${solvedInChap}/${chap.clues.length}`;
+        }
+
+        function openInvestigateModal(clue) {
+            if (solvedClues.has(clue.id)) {
+                alert('🌸 这个魔法线索已经解答完成，知识要点已收录至学霸宝典！');
+                return;
+            }
+
+            document.getElementById('modal-clue-title').innerText = clue.label;
+            document.getElementById('modal-question').innerText = clue.q;
+
+            const optionsContainer = document.getElementById('modal-options');
+            optionsContainer.innerHTML = '';
+
+            document.getElementById('modal-feedback').classList.add('hidden');
+            document.getElementById('modal-next-btn').classList.add('hidden');
+
+            clue.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3 rounded-2xl bg-pink-50/70 hover:bg-pink-100/80 border-2 border-pink-200 hover:border-pink-400 text-xs sm:text-sm text-pink-950 font-bold transition flex items-center gap-3';
+                btn.innerHTML = `
+                    <span class="w-6 h-6 rounded-full bg-pink-200 text-pink-700 flex items-center justify-center text-xs font-extrabold shrink-0">${String.fromCharCode(65 + idx)}</span>
+                    <span>${opt}</span>
+                `;
+                btn.onclick = () => handleAnswer(idx, clue, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('investigate-modal').classList.remove('hidden');
+            document.getElementById('investigate-modal').classList.add('flex');
+        }
+
+        function handleAnswer(selectedIdx, clue, btnEl) {
+            const container = document.getElementById('modal-options');
+            const buttons = container.querySelectorAll('button');
+            buttons.forEach(b => b.disabled = true);
+
+            const feedbackEl = document.getElementById('modal-feedback');
+            feedbackEl.classList.remove('hidden');
+
+            if (selectedIdx === clue.answer) {
+                btnEl.classList.add('border-emerald-400', 'bg-emerald-50', 'text-emerald-900');
+                
+                feedbackEl.className = 'p-3.5 rounded-2xl text-xs leading-relaxed mb-4 bg-emerald-50 border-2 border-emerald-200 text-emerald-900 font-medium';
+                feedbackEl.innerHTML = `
+                    <div class="font-bold text-sm mb-1 text-emerald-700"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> 解答正确！解锁魔法记忆！</div>
+                    <p class="mb-2 opacity-90">${clue.explanation}</p>
+                    <div class="flex items-center gap-3 font-bold text-pink-700 bg-pink-100/60 p-2 rounded-xl">
+                        <span>获得了宝藏奖励：</span>
+                        <span><i class="fa-solid fa-gem text-pink-500"></i> +${clue.rewardCrystal} 水晶</span>
+                        <span><i class="fa-solid fa-coins text-amber-500"></i> +${clue.rewardGold} 金币</span>
+                    </div>
+                `;
+
+                crystal += clue.rewardCrystal;
+                gold += clue.rewardGold;
+                solvedClues.add(clue.id);
+
+                if (!unlockedArchives.includes(clue.archiveKey)) {
+                    unlockedArchives.push(clue.archiveKey);
+                }
+
+                confetti({ particleCount: 70, spread: 80, origin: { y: 0.6 } });
+            } else {
+                btnEl.classList.add('border-rose-400', 'bg-rose-50', 'text-rose-900');
+                buttons[clue.answer].classList.add('border-emerald-400', 'bg-emerald-50');
+
+                feedbackEl.className = 'p-3.5 rounded-2xl text-xs leading-relaxed mb-4 bg-rose-50 border-2 border-rose-200 text-rose-900 font-medium';
+                feedbackEl.innerHTML = `
+                    <div class="font-bold text-sm mb-1 text-rose-700"><i class="fa-solid fa-circle-xmark mr-1"></i> 再接再厉！正确解析如下：</div>
+                    <p class="opacity-90">${clue.explanation}</p>
+                `;
+            }
+
+            updateResourceUI();
+            renderMap();
+            renderArchive();
+            document.getElementById('modal-next-btn').classList.remove('hidden');
+        }
+
+        function closeInvestigateModal() {
+            document.getElementById('investigate-modal').classList.add('hidden');
+            document.getElementById('investigate-modal').classList.remove('flex');
+        }
+
+        function renderBuildings() {
+            const grid = document.getElementById('buildings-grid');
+            grid.innerHTML = '';
+
+            let totalProsperity = 0;
+
+            BUILDINGS_DB.forEach(b => {
+                if (b.built) totalProsperity += b.prosperity;
+
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-3xl border-2 transition flex flex-col justify-between ${b.built ? 'bg-pink-50/80 border-pink-400 shadow-md' : 'bg-white/90 border-pink-200'}`;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-12 h-12 rounded-2xl ${b.built ? 'bg-pink-500 text-white' : 'bg-pink-100 text-pink-400'} flex items-center justify-center text-xl font-bold shadow-sm">
+                                <i class="fa-solid ${b.icon}"></i>
+                            </div>
+                            <span class="text-xs font-extrabold ${b.built ? 'text-pink-600 bg-pink-100 px-3 py-1 rounded-full border border-pink-300' : 'text-pink-300'}">
+                                ${b.built ? '✨ 已建在城堡' : '未解锁'}
+                            </span>
+                        </div>
+                        <h3 class="font-extrabold text-pink-900 text-sm sm:text-base">${b.name}</h3>
+                        <p class="text-xs text-pink-600 mt-1 leading-relaxed">${b.desc}</p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-pink-100 flex items-center justify-between">
+                        <div class="text-[11px] font-bold text-pink-500 space-x-2">
+                            <span><i class="fa-solid fa-gem text-pink-500"></i> ${b.costCrystal}</span>
+                            <span><i class="fa-solid fa-coins text-amber-500"></i> ${b.costGold}</span>
+                        </div>
+                        ${!b.built ? `
+                            <button onclick="buildStructure('${b.id}')" class="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white font-black px-3.5 py-1.5 rounded-xl text-xs shadow-md transition">
+                                建造 (+${b.prosperity})
+                            </button>
+                        ` : `
+                            <span class="text-xs text-pink-600 font-extrabold"><i class="fa-solid fa-sparkles mr-1"></i> 魅力值 +${b.prosperity}</span>
+                        `}
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            document.getElementById('prosperity-score').innerText = `${totalProsperity} pts`;
+        }
+
+        function buildStructure(id) {
+            const b = BUILDINGS_DB.find(x => x.id === id);
+            if (!b) return;
+
+            if (crystal >= b.costCrystal && gold >= b.costGold) {
+                crystal -= b.costCrystal;
+                gold -= b.costGold;
+                b.built = true;
+
+                updateResourceUI();
+                renderBuildings();
+                confetti({ particleCount: 90, spread: 80, origin: { y: 0.5 } });
+            } else {
+                alert('🌸 你的粉水晶或魔法金币不够哦！请再去探险答题赚取更多资源吧！');
+            }
+        }
+
+        function renderArchive() {
+            const list = document.getElementById('archive-list');
+            list.innerHTML = '';
+
+            if (unlockedArchives.length === 0) {
+                list.innerHTML = `
+                    <div class="col-span-2 text-center py-12 text-pink-400 text-xs font-bold">
+                        <i class="fa-solid fa-box-open text-4xl mb-2 block text-pink-300"></i>
+                        暂无解锁档案，快去地图解答线索吧！
+                    </div>
+                `;
+                return;
+            }
+
+            unlockedArchives.forEach((arch, idx) => {
+                const item = document.createElement('div');
+                item.className = 'p-3.5 rounded-2xl bg-white border-2 border-pink-200 text-xs text-pink-900 font-medium shadow-sm flex items-start gap-3';
+                item.innerHTML = `
+                    <span class="w-6 h-6 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-extrabold text-xs shrink-0 border border-pink-200">${idx + 1}</span>
+                    <div class="leading-relaxed font-bold">${arch}</div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function updateResourceUI() {
+            document.getElementById('crystal-val').innerText = crystal;
+            document.getElementById('gold-val').innerText = gold;
+        }
+
+        function toggleEditorModal() {
+            const m = document.getElementById('editor-modal');
+            m.classList.toggle('hidden');
+            m.classList.toggle('flex');
+        }
+
+        function loadPresetData(type) {
+            chaptersData = JSON.parse(JSON.stringify(KSSR_P5_DATA));
+            document.getElementById('editor-json-text').value = JSON.stringify(chaptersData, null, 2);
+            alert('已成功重置为 KSSR 五年级历史教案标准题库！');
+        }
+
+        function saveCustomData() {
+            try {
+                const val = document.getElementById('editor-json-text').value;
+                const parsed = JSON.parse(val);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    chaptersData = parsed;
+                    currentChapterIndex = 0;
+                    solvedClues.clear();
+                    renderMap();
+                    renderArchive();
+                    toggleEditorModal();
+                    alert('✨ 题目与关卡配置保存成功！');
+                }
+            } catch (e) {
+                alert('JSON格式有误，请检查语法！');
+            }
+        }
+    </script>
+</body>
+</html>
